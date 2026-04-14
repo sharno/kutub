@@ -86,40 +86,43 @@ const { Content } = await render(chapter);
         id="chapter-sidebar"
         data-scroll-key={book.data.slug}
         data-chapter-sidebar
+        dir="ltr"
         style="visibility: hidden;"
         class="hidden max-h-[calc(100vh-2rem)] overflow-y-auto px-4 py-6 lg:grid lg:sticky lg:top-0"
         aria-label="فصول الكتاب"
       >
-        <div class="grid gap-1 border-b border-[rgba(73,53,34,0.12)] pb-4">
-          <div class="eyebrow">الفهرس</div>
-          <a href={`/books/${book.data.slug}`} class="font-display text-2xl leading-tight text-ink no-underline">
-            {book.data.title}
-          </a>
-          <p class="text-sm text-muted">{book.data.author}</p>
-          <p class="text-xs text-muted">{chapters.length} فصل</p>
-        </div>
+        <div dir={book.data.direction} class="grid text-right">
+          <div class="grid gap-1 border-b border-[rgba(73,53,34,0.12)] pb-4">
+            <div class="eyebrow">الفهرس</div>
+            <a href={`/books/${book.data.slug}`} class="font-display text-2xl leading-tight text-ink no-underline">
+              {book.data.title}
+            </a>
+            <p class="text-sm text-muted">{book.data.author}</p>
+            <p class="text-xs text-muted">{chapters.length} فصل</p>
+          </div>
 
-        <div class="mt-4 grid gap-1.5">
-          {chapters.map((entry) => {
-            const isActive = entry.id === chapter.id;
-            return (
-              <a
-                href={getChapterUrl(entry)}
-                aria-current={isActive ? "page" : undefined}
-                class:list={[
-                  "rounded-xl px-3 py-2 no-underline transition",
-                  isActive
-                    ? "bg-[rgba(142,75,34,0.12)] text-bronze-strong"
-                    : "text-muted hover:bg-[rgba(142,75,34,0.07)] hover:text-bronze-strong",
-                ]}
-              >
-                <span class="block text-xs uppercase tracking-[0.08em]">الفصل {entry.data.order}</span>
-                <span class:list={["mt-1 block font-display text-lg leading-tight", isActive ? "text-bronze-strong" : "text-ink"]}>
-                  {entry.data.title}
-                </span>
-              </a>
-            );
-          })}
+          <div class="mt-4 grid gap-1.5">
+            {chapters.map((entry) => {
+              const isActive = entry.id === chapter.id;
+              return (
+                <a
+                  href={getChapterUrl(entry)}
+                  aria-current={isActive ? "page" : undefined}
+                  class:list={[
+                    "rounded-xl px-3 py-2 no-underline transition",
+                    isActive
+                      ? "bg-[rgba(142,75,34,0.12)] text-bronze-strong"
+                      : "text-muted hover:bg-[rgba(142,75,34,0.07)] hover:text-bronze-strong",
+                  ]}
+                >
+                  <span class="block text-xs uppercase tracking-[0.08em]">الفصل {entry.data.order}</span>
+                  <span class:list={["mt-1 block font-display text-lg leading-tight", isActive ? "text-bronze-strong" : "text-ink"]}>
+                    {entry.data.title}
+                  </span>
+                </a>
+              );
+            })}
+          </div>
         </div>
       </nav>
     </aside>
