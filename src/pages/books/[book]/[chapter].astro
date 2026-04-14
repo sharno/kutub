@@ -1,7 +1,7 @@
 ---
 import { render } from "astro:content";
 import BaseLayout from "../../../layouts/BaseLayout.astro";
-import { getBookBySlug, getBooks, getChapterUrl, getChaptersForBook } from "../../../lib/content";
+import { getBookBySlug, getBookDownloadUrl, getBooks, getChapterUrl, getChaptersForBook } from "../../../lib/content";
 
 export async function getStaticPaths() {
   const books = await getBooks();
@@ -52,56 +52,122 @@ const { Content } = await render(chapter);
   description={chapter.data.excerpt ?? book.data.description}
   dir={book.data.direction}
 >
-  <article class="grid gap-4">
-    <header class="hero-panel">
-      <div class="eyebrow">نص مفهرس</div>
-      <div class="meta-row">
-        <a class="text-bronze-strong" href={`/books/${book.data.slug}`}>
-          {book.data.title}
-        </a>
-        <span class="text-muted">المؤلف: {book.data.author}</span>
+  <div class="grid gap-4 lg:grid-cols-[18rem_minmax(0,1fr)] lg:items-start">
+    <aside class="grid gap-4" data-pagefind-ignore="all">
+      <details class="surface-panel p-4 lg:hidden" open>
+        <summary class="cursor-pointer list-none font-display text-xl leading-tight text-ink">
+          فصول الكتاب
+        </summary>
+        <div class="mt-4 grid gap-2">
+          {chapters.map((entry) => {
+            const isActive = entry.id === chapter.id;
+            return (
+              <a
+                href={getChapterUrl(entry)}
+                aria-current={isActive ? "page" : undefined}
+                class:list={[
+                  "rounded-2xl border px-3 py-3 text-sm no-underline transition",
+                  isActive
+                    ? "border-[rgba(142,75,34,0.25)] bg-[rgba(142,75,34,0.12)] text-bronze-strong"
+                    : "border-[rgba(73,53,34,0.1)] bg-white/70 text-muted hover:border-[rgba(142,75,34,0.22)] hover:text-bronze-strong",
+                ]}
+              >
+                <span class="block font-medium">الفصل {entry.data.order}</span>
+                <span class="mt-1 block font-display text-lg leading-tight text-ink">{entry.data.title}</span>
+              </a>
+            );
+          })}
+        </div>
+      </details>
+
+      <nav class="surface-panel hidden max-h-[calc(100vh-7rem)] overflow-y-auto p-4 lg:grid lg:sticky lg:top-6" aria-label="فصول الكتاب">
+        <div class="grid gap-1 border-b border-[rgba(73,53,34,0.12)] pb-4">
+          <div class="eyebrow">التصفح</div>
+          <a href={`/books/${book.data.slug}`} class="font-display text-2xl leading-tight text-bronze-strong no-underline">
+            {book.data.title}
+          </a>
+          <p class="text-sm text-muted">{chapters.length} فصل</p>
+        </div>
+
+        <div class="mt-4 grid gap-2">
+          {chapters.map((entry) => {
+            const isActive = entry.id === chapter.id;
+            return (
+              <a
+                href={getChapterUrl(entry)}
+                aria-current={isActive ? "page" : undefined}
+                class:list={[
+                  "rounded-2xl border px-3 py-3 no-underline transition",
+                  isActive
+                    ? "border-[rgba(142,75,34,0.25)] bg-[rgba(142,75,34,0.12)] text-bronze-strong"
+                    : "border-[rgba(73,53,34,0.1)] bg-white/70 text-muted hover:border-[rgba(142,75,34,0.22)] hover:text-bronze-strong",
+                ]}
+              >
+                <span class="block text-xs uppercase tracking-[0.08em]">الفصل {entry.data.order}</span>
+                <span class:list={["mt-1 block font-display text-lg leading-tight", isActive ? "text-bronze-strong" : "text-ink"]}>
+                  {entry.data.title}
+                </span>
+              </a>
+            );
+          })}
+        </div>
+      </nav>
+    </aside>
+
+    <article class="grid gap-4">
+      <header class="hero-panel">
+        <div class="eyebrow">نص مفهرس</div>
+        <div class="meta-row">
+          <a class="text-bronze-strong" href={`/books/${book.data.slug}`}>
+            {book.data.title}
+          </a>
+          <span class="text-muted">المؤلف: {book.data.author}</span>
+        </div>
+        <h1 class="font-display text-[clamp(2.4rem,6vw,4.3rem)] leading-tight">{chapter.data.title}</h1>
+        {chapter.data.excerpt && <p>{chapter.data.excerpt}</p>}
+
+        <div class="flex flex-wrap gap-2">
+          <span class="pill" data-pagefind-filter={`book:${book.data.title}`}>{book.data.title}</span>
+          <span class="pill" data-pagefind-filter={`author:${book.data.author}`}>{book.data.author}</span>
+          <a class="pill" href={getBookDownloadUrl(book)} download={`${book.data.slug}.md`}>
+            تنزيل Markdown
+          </a>
+        </div>
+      </header>
+
+      <div class="surface-panel grid gap-4 p-5 md:p-6" data-pagefind-body>
+        <div class="meta-row text-sm text-muted">
+          <span data-pagefind-meta="book">{book.data.title}</span>
+          <span data-pagefind-meta="author">{book.data.author}</span>
+          <span data-pagefind-meta="chapter">{chapter.data.title}</span>
+        </div>
+
+        <div class="reader-prose">
+          <Content />
+        </div>
       </div>
-      <h1 class="font-display text-[clamp(2.4rem,6vw,4.3rem)] leading-tight">{chapter.data.title}</h1>
-      {chapter.data.excerpt && <p>{chapter.data.excerpt}</p>}
 
-      <div class="flex flex-wrap gap-2">
-        <span class="pill" data-pagefind-filter={`book:${book.data.title}`}>{book.data.title}</span>
-        <span class="pill" data-pagefind-filter={`author:${book.data.author}`}>{book.data.author}</span>
-      </div>
-    </header>
+      <nav
+        class="surface-panel meta-row justify-between p-5"
+        aria-label="التنقل بين الفصول"
+        data-pagefind-ignore="all"
+      >
+        {previousChapter ? (
+          <a href={getChapterUrl(previousChapter)} class="text-bronze-strong">
+            ← {previousChapter.data.title}
+          </a>
+        ) : (
+          <span class="text-muted">بداية الكتاب</span>
+        )}
 
-    <div class="surface-panel grid gap-4 p-5" data-pagefind-body>
-      <div class="meta-row text-sm text-muted">
-        <span data-pagefind-meta="book">{book.data.title}</span>
-        <span data-pagefind-meta="author">{book.data.author}</span>
-        <span data-pagefind-meta="chapter">{chapter.data.title}</span>
-      </div>
-
-      <div class="reader-prose">
-        <Content />
-      </div>
-    </div>
-
-    <nav
-      class="surface-panel meta-row justify-between p-5"
-      aria-label="التنقل بين الفصول"
-      data-pagefind-ignore="all"
-    >
-      {previousChapter ? (
-        <a href={getChapterUrl(previousChapter)} class="text-bronze-strong">
-          ← {previousChapter.data.title}
-        </a>
-      ) : (
-        <span class="text-muted">بداية الكتاب</span>
-      )}
-
-      {nextChapter ? (
-        <a href={getChapterUrl(nextChapter)} class="text-bronze-strong">
-          {nextChapter.data.title} →
-        </a>
-      ) : (
-        <span class="text-muted">نهاية الفصول الحالية</span>
-      )}
-    </nav>
-  </article>
+        {nextChapter ? (
+          <a href={getChapterUrl(nextChapter)} class="text-bronze-strong">
+            {nextChapter.data.title} →
+          </a>
+        ) : (
+          <span class="text-muted">نهاية الفصول الحالية</span>
+        )}
+      </nav>
+    </article>
+  </div>
 </BaseLayout>

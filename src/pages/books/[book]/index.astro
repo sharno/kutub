@@ -1,6 +1,6 @@
 ---
 import BaseLayout from "../../../layouts/BaseLayout.astro";
-import { getBookBySlug, getBooks, getChapterUrl, getChaptersForBook } from "../../../lib/content";
+import { getBookBySlug, getBookDownloadUrl, getBooks, getChapterUrl, getChaptersForBook } from "../../../lib/content";
 
 export async function getStaticPaths() {
   const books = await getBooks();
@@ -34,6 +34,17 @@ const chapters = await getChaptersForBook(book.data.slug);
     <div class="flex flex-wrap gap-2">
       {book.data.tags.map((tag) => <span class="pill">{tag}</span>)}
       <span class="pill">{book.data.status}</span>
+    </div>
+
+    <div class="flex flex-wrap gap-2 pt-1">
+      <a class="pill" href={getBookDownloadUrl(book)} download={`${book.data.slug}.md`}>
+        تنزيل الكتاب بصيغة Markdown
+      </a>
+      {book.data.sourceUrl && (
+        <a class="pill" href={book.data.sourceUrl} target="_blank" rel="noreferrer">
+          مصدر النص
+        </a>
+      )}
     </div>
   </section>
 

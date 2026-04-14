@@ -1,4 +1,4 @@
-import { mkdir, readFile, readdir, rm, writeFile } from "node:fs/promises";
+import { copyFile, mkdir, readFile, readdir, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
 import {
   cleanupPageText,
@@ -33,6 +33,7 @@ interface FinalChapter {
 const projectRoot = process.cwd();
 const booksDir = path.join(projectRoot, "src", "data", "books");
 const generatedRoot = path.join(projectRoot, "src", "generated", "chapters");
+const downloadsRoot = path.join(projectRoot, "public", "downloads");
 
 const bookFiles = (await readdir(booksDir))
   .filter((entry) => entry.endsWith(".json"))
@@ -53,6 +54,13 @@ for (const bookFile of bookFiles) {
 
   await rm(bookDir, { recursive: true, force: true });
   await mkdir(bookDir, { recursive: true });
+  await mkdir(downloadsRoot, { recursive: true });
+
+  if (book.canonicalSource) {
+    const canonicalPath = path.resolve(projectRoot, book.canonicalSource);
+    const downloadPath = path.join(downloadsRoot, `${book.slug}.md`);
+    await copyFile(canonicalPath, downloadPath);
+  }
 
   for (const chapter of chapters) {
     const filename = `${chapter.slug}.md`;

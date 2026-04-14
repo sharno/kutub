@@ -18,6 +18,9 @@ npm run build
 أثناء `dev` و`build` يتم أولًا تشغيل `npm run sync-content` لتوليد الفصول من المصادر canonical، ثم
 يقوم Astro بإنتاج الصفحات داخل `dist/` ثم يقوم Pagefind بإنشاء فهرس البحث داخل المجلد نفسه.
 
+إذا وُجد `canonicalSource` للكتاب، تُنسخ نسخة Markdown أيضًا إلى `public/downloads/<slug>.md` لتكون
+قابلة للتنزيل مباشرة من الموقع.
+
 ## هيكل المحتوى
 
 - `src/data/books/*.json`: بيانات الكتب

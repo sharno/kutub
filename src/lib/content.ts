@@ -22,6 +22,10 @@ export function getBookUrl(book: BookEntry) {
   return `/books/${book.data.slug}`;
 }
 
+export function getBookDownloadUrl(book: BookEntry) {
+  return `/downloads/${book.data.slug}.md`;
+}
+
 export function getChapterUrl(chapter: ChapterEntry) {
   return `/books/${chapter.data.book}/${chapter.data.slug}`;
 }
