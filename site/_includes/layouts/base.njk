@@ -1,32 +1,17 @@
----
-import "../styles/global.css";
-
-interface Props {
-  title: string;
-  description?: string;
-  dir?: "rtl" | "ltr";
-}
-
-const {
-  title,
-  description = "مكتبة عربية للقراءة والبحث داخل النصوص.",
-  dir = "rtl",
-} = Astro.props;
----
-
 <!doctype html>
-<html lang="ar" dir={dir}>
+<html lang="ar" dir="{{ dir or 'rtl' }}">
   <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="description" content={description} />
-    <title>{title}</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="{{ description or site.description }}">
+    <title>{{ title }}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
       href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap"
       rel="stylesheet"
-    />
+    >
+    <link rel="stylesheet" href="/assets/site.css">
   </head>
   <body class="text-ink">
     <div class="min-h-screen px-3 py-4 md:px-4 md:pb-6">
@@ -58,7 +43,7 @@ const {
         </header>
 
         <main class="p-3 md:p-5">
-          <slot />
+          {{ content | safe }}
         </main>
       </div>
     </div>

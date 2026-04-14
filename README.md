@@ -1,6 +1,6 @@
 # كُتُب
 
-مكتبة عربية ثابتة مبنية على `Astro` و`Pagefind` للنشر السريع على `Cloudflare Pages`.
+مكتبة عربية ثابتة مبنية على `11ty` و`Pagefind` للنشر السريع على `Cloudflare Pages`.
 
 ## التشغيل
 
@@ -15,14 +15,16 @@ npm run dev
 npm run build
 ```
 
-أثناء `dev` و`build` يتم أولًا تشغيل `npm run sync-content` لتوليد الفصول من المصادر canonical، ثم
-يقوم Astro بإنتاج الصفحات داخل `dist/` ثم يقوم Pagefind بإنشاء فهرس البحث داخل المجلد نفسه.
+أثناء `dev` و`build` يتم أولًا تشغيل `npm run sync-content` لتوليد الفصول من المصادر canonical،
+ثم يُبنى `site/assets/site.css` عبر Tailwind CLI، ثم يولد `11ty` الصفحات داخل `dist/`، ثم ينشئ
+Pagefind فهرس البحث داخل المجلد نفسه.
 
 إذا وُجد `canonicalSource` للكتاب، تُنسخ نسخة Markdown أيضًا إلى `public/downloads/<slug>.md` لتكون
 قابلة للتنزيل مباشرة من الموقع.
 
 ## هيكل المحتوى
 
+- `site/`: قوالب 11ty والواجهات والـ assets
 - `src/data/books/*.json`: بيانات الكتب
 - `src/data/chapters/<book>/*.md`: فصول الكتب
 - `sources/turath/*.meta.json`: بيانات تراث والفهارس
@@ -50,4 +52,4 @@ npm run import:turath -- 8180
 
 ## ملاحظة عن البحث
 
-صفحة البحث تعمل بعد البناء فقط لأن ملفات Pagefind لا تُولد أثناء `astro dev`.
+صفحة البحث تعمل بعد البناء فقط لأن ملفات Pagefind لا تُولد أثناء `11ty --serve`.

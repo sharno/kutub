@@ -1,18 +1,22 @@
 {
   "name": "kutub",
   "version": "1.0.0",
-  "description": "Static Arabic books library built with Astro and Pagefind.",
+  "description": "Static Arabic books library built with Eleventy and Pagefind.",
   "scripts": {
     "import:turath": "tsx scripts/import-turath-book.ts",
     "sync-content": "tsx scripts/generate-canonical-chapters.ts",
-    "dev": "npm run sync-content && astro dev",
-    "build": "npm run sync-content && astro build && pagefind --site dist",
-    "preview": "npm run sync-content && astro preview",
-    "preview:e2e": "npm run build && astro preview --host 127.0.0.1 --port 4173",
+    "css": "tailwindcss -i ./src/styles/global.css -o ./site/assets/site.css --minify",
+    "css:watch": "tailwindcss -i ./src/styles/global.css -o ./site/assets/site.css --watch",
+    "eleventy": "node --import tsx ./node_modules/@11ty/eleventy/cmd.cjs",
+    "eleventy:serve": "node --import tsx ./node_modules/@11ty/eleventy/cmd.cjs --serve --port=4321",
+    "dev": "npm run sync-content && npm run css && run-p css:watch eleventy:serve",
+    "build": "npm run sync-content && npm run css && npm run eleventy && pagefind --site dist",
+    "preview": "http-server dist -a 127.0.0.1 -p 4173 -c-1",
+    "preview:e2e": "npm run build && npm run preview",
     "test:e2e": "playwright test"
   },
   "keywords": [
-    "astro",
+    "eleventy",
     "pagefind",
     "arabic",
     "books"
@@ -21,14 +25,19 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "@tailwindcss/vite": "^4.2.2",
-    "astro": "^6.1.6",
+    "@11ty/eleventy": "^3.1.5",
+    "@tailwindcss/cli": "^4.2.2",
+    "http-server": "^14.1.1",
+    "markdown-it": "^14.1.1",
+    "npm-run-all": "^4.1.5",
     "pagefind": "^1.5.2",
     "tailwindcss": "^4.2.2",
     "tsx": "^4.21.0"
   },
   "devDependencies": {
     "@playwright/test": "^1.59.1",
-    "@types/node": "^25.6.0"
+    "@types/markdown-it": "^14.1.2",
+    "@types/node": "^25.6.0",
+    "typescript": "^5.9.3"
   }
 }

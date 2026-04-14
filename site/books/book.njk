@@ -1,0 +1,64 @@
+---
+layout: layouts/base.njk
+pagination:
+  data: library.books
+  size: 1
+  alias: book
+permalink: "/books/{{ book.slug }}/index.html"
+eleventyComputed:
+  title: "{{ book.title }} | كُتُب"
+  description: "{{ book.description }}"
+  dir: "{{ book.direction }}"
+---
+<section class="hero-panel" data-pagefind-ignore="all">
+  <div class="eyebrow">كتاب</div>
+  <h1 class="font-display text-[clamp(2.4rem,6vw,4.3rem)] leading-tight">{{ book.title }}</h1>
+  <p class="text-muted">المؤلف: {{ book.author }}</p>
+  <p>{{ book.description }}</p>
+
+  <div class="flex flex-wrap gap-2">
+    {% for tag in book.tags %}
+      <span class="pill">{{ tag }}</span>
+    {% endfor %}
+    <span class="pill">{{ book.status }}</span>
+  </div>
+
+  <div class="flex flex-wrap gap-2 pt-1">
+    <a class="pill" href="{{ book.downloadUrl }}" download="{{ book.slug }}.md">
+      تنزيل الكتاب بصيغة Markdown
+    </a>
+    {% if book.sourceUrl %}
+      <a class="pill" href="{{ book.sourceUrl }}" target="_blank" rel="noreferrer">
+        مصدر النص
+      </a>
+    {% endif %}
+  </div>
+</section>
+
+<div class="h-6"></div>
+
+<section class="grid gap-4">
+  <div class="meta-row justify-between">
+    <div>
+      <div class="eyebrow">الفصول</div>
+      <h2 class="font-display text-[clamp(1.6rem,4vw,2.5rem)] leading-tight">محتويات الكتاب</h2>
+    </div>
+    <p class="text-muted">{{ book.chapters | length }} فصل</p>
+  </div>
+
+  <div class="grid gap-4" data-pagefind-ignore="all">
+    {% for chapter in book.chapters %}
+      <article class="surface-panel grid gap-3 p-5">
+        <div class="eyebrow">الفصل {{ chapter.order }}</div>
+        <h3 class="font-display text-2xl leading-tight">
+          <a href="{{ chapter.url }}" class="text-bronze-strong">
+            {{ chapter.title }}
+          </a>
+        </h3>
+        {% if chapter.excerpt %}
+          <p>{{ chapter.excerpt }}</p>
+        {% endif %}
+      </article>
+    {% endfor %}
+  </div>
+</section>

@@ -1,0 +1,36 @@
+---
+layout: layouts/base.njk
+title: "كُتُب | مكتبة عربية للقراءة"
+description: "كتب عربية مرتبة للقراءة والبحث."
+---
+<section class="hero-panel" data-pagefind-ignore="all">
+  <div class="meta-row justify-between">
+    <div>
+      <h1 class="font-display text-[clamp(1.6rem,3.5vw,2.2rem)] leading-tight">المكتبة</h1>
+      <p class="m-0 text-sm text-muted">كتب مرتبة للقراءة والبحث.</p>
+    </div>
+    <a class="pill" href="/search">البحث</a>
+  </div>
+</section>
+
+<div class="h-4"></div>
+
+<section class="grid gap-4" id="books">
+  <div class="meta-row justify-between">
+    <div>
+      <h2 class="font-display text-[clamp(1.25rem,2.6vw,1.8rem)] leading-tight">الكتب</h2>
+    </div>
+    <p class="text-muted">{{ library.books | length }} كتاب جاهز</p>
+  </div>
+
+  <div class="grid grid-cols-[repeat(auto-fit,minmax(17rem,1fr))] gap-4" data-pagefind-ignore="all">
+    {% for book in library.books %}
+      {% include "partials/book-card.njk" %}
+    {% endfor %}
+  </div>
+</section>
+
+<div class="h-4"></div>
+
+{% set heading = "ابحث داخل الكتب" %}
+{% include "partials/search-panel.njk" %}

@@ -1,0 +1,24 @@
+<article class="grid gap-2 rounded-[12px] border border-[rgba(73,53,34,0.14)] bg-white p-3">
+  <h3 class="font-display text-[1.35rem] leading-tight">
+    <a href="{{ book.url }}" class="text-bronze-strong">
+      {{ book.title }}
+    </a>
+  </h3>
+  <p class="text-muted">المؤلف: {{ book.author }}</p>
+  <p class="text-sm">{{ book.description }}</p>
+
+  <div class="flex flex-wrap gap-1.5">
+    {% for tag in book.tags %}
+      <span class="pill">{{ tag }}</span>
+    {% endfor %}
+  </div>
+
+  <div class="meta-row pt-1 text-sm" data-pagefind-ignore="all">
+    <a href="{{ book.url }}" class="pill">
+      قراءة
+    </a>
+    <a href="{{ book.downloadUrl }}" class="pill" download="{{ book.slug }}.md">
+      تنزيل
+    </a>
+  </div>
+</article>

@@ -1,14 +1,6 @@
----
-interface Props {
-  heading?: string;
-}
-
-const { heading = "ابحث في الكتب" } = Astro.props;
----
-
 <section class="grid gap-4">
   <div>
-    <h2 class="font-display text-[clamp(1.25rem,2.6vw,1.8rem)] leading-tight">{heading}</h2>
+    <h2 class="font-display text-[clamp(1.25rem,2.6vw,1.8rem)] leading-tight">{{ heading }}</h2>
   </div>
 
   <div class="surface-panel px-3 py-2 text-sm text-muted" id="search-status">

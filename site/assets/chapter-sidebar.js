@@ -1,22 +1,16 @@
 const SIDEBAR_SELECTOR = "[data-chapter-sidebar]";
 
-type SidebarElement = HTMLElement & {
-  dataset: DOMStringMap & {
-    scrollKey?: string;
-  };
-};
-
-function getStorageKey(sidebar: SidebarElement) {
+function getStorageKey(sidebar) {
   return `chapter-sidebar-scroll:${sidebar.dataset.scrollKey ?? ""}`;
 }
 
-function revealSidebar(sidebar: SidebarElement) {
+function revealSidebar(sidebar) {
   requestAnimationFrame(() => {
     sidebar.style.visibility = "";
   });
 }
 
-function restoreSidebarScroll(sidebar: SidebarElement) {
+function restoreSidebarScroll(sidebar) {
   const savedScrollTop = sessionStorage.getItem(getStorageKey(sidebar));
   if (savedScrollTop !== null) {
     sidebar.scrollTop = Number(savedScrollTop);
@@ -24,7 +18,7 @@ function restoreSidebarScroll(sidebar: SidebarElement) {
     return;
   }
 
-  const activeLink = sidebar.querySelector<HTMLElement>('[aria-current="page"]');
+  const activeLink = sidebar.querySelector('[aria-current="page"]');
   if (activeLink) {
     activeLink.scrollIntoView({ block: "nearest" });
   }
@@ -32,7 +26,7 @@ function restoreSidebarScroll(sidebar: SidebarElement) {
   revealSidebar(sidebar);
 }
 
-function persistSidebarScroll(sidebar: SidebarElement) {
+function persistSidebarScroll(sidebar) {
   sessionStorage.setItem(getStorageKey(sidebar), String(sidebar.scrollTop));
 }
 
@@ -44,8 +38,8 @@ function waitForFonts() {
   return Promise.resolve();
 }
 
-export function initChapterSidebar() {
-  const sidebar = document.querySelector<SidebarElement>(SIDEBAR_SELECTOR);
+function initChapterSidebar() {
+  const sidebar = document.querySelector(SIDEBAR_SELECTOR);
   if (!sidebar) {
     return;
   }

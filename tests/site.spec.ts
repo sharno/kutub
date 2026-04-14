@@ -6,7 +6,7 @@ test.describe("kutub site", () => {
 
     await expect(page).toHaveTitle(/كُتُب/);
     await expect(page.getByRole("heading", { level: 1, name: "المكتبة" })).toBeVisible();
-    await expect(page.getByRole("link", { name: "البحث" })).toHaveAttribute("href", "/search");
+    await expect(page.locator("section.hero-panel").getByRole("link", { name: "البحث" })).toHaveAttribute("href", "/search");
 
     const bookCard = page.locator("article").filter({ has: page.getByRole("link", { name: "الرسالة" }) }).first();
     await expect(bookCard).toBeVisible();
@@ -42,7 +42,7 @@ test.describe("kutub site", () => {
     await expect(downloadLink).toHaveAttribute("href", "/downloads/al-risala.md");
 
     const firstChapterLink = page.getByRole("link", { name: "مقدمة المحقق" }).first();
-    await expect(firstChapterLink).toHaveAttribute("href", "/books/al-risala/001-%D9%85%D9%82%D8%AF%D9%85%D8%A9-%D8%A7%D9%84%D9%85%D8%AD%D9%82%D9%82");
+    await expect(firstChapterLink).toHaveAttribute("href", "/books/al-risala/001-مقدمة-المحقق");
   });
 
   test("chapter page renders reading tools, footnotes, and navigation", async ({ page }) => {
@@ -58,13 +58,14 @@ test.describe("kutub site", () => {
     await expect(page.locator(".page-separator").first()).toContainText("ج 1");
     await expect(page.locator(".page-separator").first()).toContainText("ص 200");
 
-    await expect(page.getByRole("link", { name: /في الحج/ })).toHaveAttribute(
+    const chapterNav = page.getByRole("navigation", { name: "التنقل بين الفصول" });
+    await expect(chapterNav.getByRole("link", { name: /في الحج/ })).toHaveAttribute(
       "href",
-      "/books/al-risala/028-%D9%81%D9%8A-%D8%A7%D9%84%D8%AD%D8%AC",
+      "/books/al-risala/028-في-الحج",
     );
-    await expect(page.getByRole("link", { name: /\[في محرمات النساء\]/ })).toHaveAttribute(
+    await expect(chapterNav.getByRole("link", { name: /\[في محرمات النساء\]/ })).toHaveAttribute(
       "href",
-      "/books/al-risala/030-%D9%81%D9%8A-%D9%85%D8%AD%D8%B1%D9%85%D8%A7%D8%AA-%D8%A7%D9%84%D9%86%D8%B3%D8%A7%D8%A1",
+      "/books/al-risala/030-في-محرمات-النساء",
     );
   });
 });

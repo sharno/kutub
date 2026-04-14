@@ -1,4 +1,6 @@
 @import "tailwindcss";
+@source "../../site/**/*.{njk,md,js}";
+@source "../../src/generated/chapters/**/*.md";
 
 @theme {
   --font-sans: "IBM Plex Sans Arabic", "Noto Sans Arabic", sans-serif;

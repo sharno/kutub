@@ -1,0 +1,136 @@
+---
+layout: layouts/base.njk
+pagination:
+  data: library.chapterPages
+  size: 1
+  alias: chapterPage
+permalink: "/books/{{ chapterPage.book.slug }}/{{ chapterPage.slug }}/index.html"
+eleventyComputed:
+  title: "{{ chapterPage.title }} | {{ chapterPage.book.title }}"
+  description: "{{ chapterPage.excerpt or chapterPage.book.description }}"
+  dir: "{{ chapterPage.book.direction }}"
+---
+<div class="grid gap-4 lg:grid-cols-[19rem_minmax(0,1fr)] lg:gap-0">
+  <aside class="grid gap-4 lg:border-s lg:border-[rgba(73,53,34,0.12)] lg:bg-[#f3efe6]" data-pagefind-ignore="all">
+    <details class="rounded-[20px] border border-[rgba(73,53,34,0.12)] bg-[#f8f5ee] p-4 lg:hidden" open>
+      <summary class="cursor-pointer list-none font-display text-xl leading-tight text-ink">
+        فصول الكتاب
+      </summary>
+      <div class="mt-4 grid gap-1.5">
+        {% for entry in chapterPage.chapters %}
+          <a
+            href="{{ entry.url }}"
+            {% if entry.slug === chapterPage.slug %}aria-current="page"{% endif %}
+            class="rounded-xl px-3 py-2 text-sm no-underline transition {% if entry.slug === chapterPage.slug %}bg-[rgba(142,75,34,0.12)] text-bronze-strong{% else %}text-muted hover:bg-[rgba(142,75,34,0.07)] hover:text-bronze-strong{% endif %}"
+          >
+            <span class="block text-xs uppercase tracking-[0.08em]">الفصل {{ entry.order }}</span>
+            <span class="mt-1 block font-display text-lg leading-tight {% if entry.slug === chapterPage.slug %}text-bronze-strong{% else %}text-ink{% endif %}">
+              {{ entry.title }}
+            </span>
+          </a>
+        {% endfor %}
+      </div>
+    </details>
+
+    <nav
+      id="chapter-sidebar"
+      data-scroll-key="{{ chapterPage.book.slug }}"
+      data-chapter-sidebar
+      dir="ltr"
+      style="visibility: hidden;"
+      class="hidden max-h-[calc(100vh-2rem)] overflow-y-auto px-4 py-6 lg:grid lg:sticky lg:top-0"
+      aria-label="فصول الكتاب"
+    >
+      <div dir="{{ chapterPage.book.direction }}" class="grid text-right">
+        <div class="grid gap-1 border-b border-[rgba(73,53,34,0.12)] pb-4">
+          <div class="eyebrow">الفهرس</div>
+          <a href="{{ chapterPage.book.url }}" class="font-display text-2xl leading-tight text-ink no-underline">
+            {{ chapterPage.book.title }}
+          </a>
+          <p class="text-sm text-muted">{{ chapterPage.book.author }}</p>
+          <p class="text-xs text-muted">{{ chapterPage.chapters | length }} فصل</p>
+        </div>
+
+        <div class="mt-4 grid gap-1.5">
+          {% for entry in chapterPage.chapters %}
+            <a
+              href="{{ entry.url }}"
+              {% if entry.slug === chapterPage.slug %}aria-current="page"{% endif %}
+              class="rounded-xl px-3 py-2 no-underline transition {% if entry.slug === chapterPage.slug %}bg-[rgba(142,75,34,0.12)] text-bronze-strong{% else %}text-muted hover:bg-[rgba(142,75,34,0.07)] hover:text-bronze-strong{% endif %}"
+            >
+              <span class="block text-xs uppercase tracking-[0.08em]">الفصل {{ entry.order }}</span>
+              <span class="mt-1 block font-display text-lg leading-tight {% if entry.slug === chapterPage.slug %}text-bronze-strong{% else %}text-ink{% endif %}">
+                {{ entry.title }}
+              </span>
+            </a>
+          {% endfor %}
+        </div>
+      </div>
+    </nav>
+  </aside>
+
+  <article class="grid gap-6 px-0 lg:px-10 lg:py-8">
+    <script type="module" src="/assets/chapter-sidebar.js"></script>
+
+    <header class="grid gap-4 border-b border-[rgba(73,53,34,0.12)] pb-6">
+      <div class="eyebrow">قراءة الكتاب</div>
+      <div class="meta-row text-sm">
+        <a class="text-bronze-strong" href="{{ chapterPage.book.url }}">
+          {{ chapterPage.book.title }}
+        </a>
+        <span class="text-muted">المؤلف: {{ chapterPage.book.author }}</span>
+        {% if chapterPage.editUrl %}
+          <a class="text-muted no-underline" href="{{ chapterPage.editUrl }}" target="_blank" rel="noreferrer">
+            &lt;تحرير&gt;
+          </a>
+        {% endif %}
+      </div>
+      <h1 class="font-display text-[clamp(2rem,4.8vw,3.2rem)] leading-tight">{{ chapterPage.title }}</h1>
+      {% if chapterPage.excerpt %}
+        <p>{{ chapterPage.excerpt }}</p>
+      {% endif %}
+
+      <div class="flex flex-wrap gap-2">
+        <span class="pill" data-pagefind-filter="book:{{ chapterPage.book.title }}">{{ chapterPage.book.title }}</span>
+        <span class="pill" data-pagefind-filter="author:{{ chapterPage.book.author }}">{{ chapterPage.book.author }}</span>
+        <a class="pill" href="{{ chapterPage.book.downloadUrl }}" download="{{ chapterPage.book.slug }}.md">
+          تنزيل Markdown
+        </a>
+      </div>
+    </header>
+
+    <div class="grid gap-4" data-pagefind-body>
+      <div class="meta-row border-b border-[rgba(73,53,34,0.1)] pb-3 text-sm text-muted">
+        <span data-pagefind-meta="book">{{ chapterPage.book.title }}</span>
+        <span data-pagefind-meta="author">{{ chapterPage.book.author }}</span>
+        <span data-pagefind-meta="chapter">{{ chapterPage.title }}</span>
+      </div>
+
+      <div class="reader-prose max-w-[48rem]">
+        {{ chapterPage.content | renderChapter | safe }}
+      </div>
+    </div>
+
+    <nav
+      class="meta-row justify-between border-t border-[rgba(73,53,34,0.12)] pt-6"
+      aria-label="التنقل بين الفصول"
+      data-pagefind-ignore="all"
+    >
+      {% if chapterPage.previousChapter %}
+        <a href="{{ chapterPage.previousChapter.url }}" class="text-bronze-strong no-underline">
+          ← {{ chapterPage.previousChapter.title }}
+        </a>
+      {% else %}
+        <span class="text-muted">بداية الكتاب</span>
+      {% endif %}
+
+      {% if chapterPage.nextChapter %}
+        <a href="{{ chapterPage.nextChapter.url }}" class="text-bronze-strong no-underline">
+          {{ chapterPage.nextChapter.title }} →
+        </a>
+      {% else %}
+        <span class="text-muted">نهاية الفصول الحالية</span>
+      {% endif %}
+    </nav>
+  </article>
+</div>
