@@ -308,7 +308,7 @@ function extractExcerpt(markdown: string): string {
 function slugifyArabic(value: string): string {
   const normalized = value
     .normalize("NFKC")
-    .replace(/[\[\](){}«»"':،؛!؟.,]/g, " ")
+    .replace(/[[\](){}«»"':،؛!؟.,]/g, " ")
     .replace(/\s+/g, "-")
     .replace(/-+/g, "-")
     .replace(/^-|-$/g, "");

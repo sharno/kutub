@@ -15,6 +15,7 @@
     "build": "npm run sync-content && npm run client && npm run css && npm run eleventy && pagefind --site dist",
     "preview": "http-server dist -a 127.0.0.1 -p 4173 -c-1",
     "preview:e2e": "npm run build && npm run preview",
+    "lint": "oxlint . --deny-warnings",
     "test:e2e": "playwright test",
     "typecheck": "tsc --noEmit"
   },
@@ -41,6 +42,7 @@
     "@playwright/test": "^1.59.1",
     "@types/markdown-it": "^14.1.2",
     "@types/node": "^25.6.0",
+    "oxlint": "^1.60.0",
     "typescript": "^5.9.3"
   }
 }

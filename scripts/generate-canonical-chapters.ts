@@ -1,6 +1,6 @@
 import { mkdir, readFile, readdir, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
-import { splitTurathJsonToChapters, yamlString, type CanonicalChapter, type TurathBookPayload, type TurathMetadataPayload } from "./turath.ts";
+import { splitTurathJsonToChapters, yamlString, type TurathBookPayload, type TurathMetadataPayload } from "./turath.ts";
 
 interface BookConfig {
   slug: string;
@@ -292,7 +292,7 @@ function sanitizePublicDownload(markdown: string): string {
 function slugifyArabic(value: string): string {
   const normalized = value
     .normalize("NFKC")
-    .replace(/[\[\](){}«»"':،؛!؟.,]/g, " ")
+    .replace(/[[\](){}«»"':،؛!؟.,]/g, " ")
     .replace(/\s+/g, "-")
     .replace(/-+/g, "-")
     .replace(/^-|-$/g, "");
