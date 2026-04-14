@@ -9,7 +9,7 @@ interface Props {
 
 const {
   title,
-  description = "مكتبة عربية ثابتة وسريعة للكتب المكتوبة بصيغة Markdown.",
+  description = "مكتبة عربية للقراءة والبحث داخل النصوص.",
   dir = "rtl",
 } = Astro.props;
 ---
@@ -29,36 +29,35 @@ const {
     />
   </head>
   <body class="text-ink">
-    <div class="min-h-screen px-4 py-8 md:px-5 md:pb-12">
-      <div class="mx-auto max-w-[76rem] overflow-hidden rounded-[32px] border border-[rgba(97,65,35,0.12)] bg-[rgba(255,252,247,0.72)] shadow-[0_20px_60px_rgba(65,42,20,0.12)] backdrop-blur-[18px]">
+    <div class="min-h-screen px-3 py-4 md:px-4 md:pb-6">
+      <div class="mx-auto max-w-[76rem] overflow-hidden rounded-[14px] border border-[rgba(97,65,35,0.12)] bg-[rgba(255,252,247,0.92)]">
         <header
-          class="flex flex-col items-start justify-between gap-4 border-b border-[rgba(73,53,34,0.14)] px-4 py-5 md:flex-row md:items-center md:px-6"
+          class="flex flex-col items-start justify-between gap-2 border-b border-[rgba(73,53,34,0.14)] px-3 py-3 md:flex-row md:items-center md:px-4"
           data-pagefind-ignore="all"
         >
-          <div class="grid gap-1">
-            <a href="/" class="font-display text-[clamp(1.5rem,3vw,2.2rem)] font-bold no-underline">
+          <div>
+            <a href="/" class="font-display text-[clamp(1.35rem,2.4vw,1.9rem)] font-bold no-underline">
               كُتُب
             </a>
-            <small class="text-sm text-muted">مكتبة عربية ثابتة قابلة للتوسعة والبحث</small>
           </div>
 
-          <nav class="flex flex-wrap gap-3" aria-label="التنقل الرئيسي">
+          <nav class="flex flex-wrap gap-2" aria-label="التنقل الرئيسي">
             <a
               href="/"
-              class="rounded-full border border-[rgba(73,53,34,0.14)] bg-white/45 px-4 py-2 no-underline transition hover:bg-white/70"
+              class="rounded-md border border-[rgba(73,53,34,0.14)] bg-white px-3 py-1.5 text-sm no-underline transition hover:bg-[#faf6ef]"
             >
               الرئيسية
             </a>
             <a
               href="/search"
-              class="rounded-full border border-[rgba(73,53,34,0.14)] bg-white/45 px-4 py-2 no-underline transition hover:bg-white/70"
+              class="rounded-md border border-[rgba(73,53,34,0.14)] bg-white px-3 py-1.5 text-sm no-underline transition hover:bg-[#faf6ef]"
             >
               البحث
             </a>
           </nav>
         </header>
 
-        <main class="p-4 md:p-6">
+        <main class="p-3 md:p-5">
           <slot />
         </main>
       </div>

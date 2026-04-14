@@ -2,14 +2,13 @@
   "title": "الرسالة",
   "slug": "al-risala",
   "author": "محمد بن إدريس الشافعي",
-  "description": "النص الكامل لكتاب الرسالة للشافعي، مولد من نسخة Markdown canonical مستوردة من تراث ثم مقسم إلى صفحات تصفح ثابتة أثناء البناء.",
+  "description": "النص الكامل لكتاب الرسالة للشافعي، مرتب في فصول واضحة للقراءة والبحث.",
   "language": "ar",
   "direction": "rtl",
   "sourceFormat": "markdown",
   "canonicalSource": "sources/turath/book-8180.md",
   "canonicalMachineSource": "sources/turath/8180.book.json",
   "canonicalMetaSource": "sources/turath/8180.meta.json",
-  "sourceUrl": "https://app.turath.io/book/8180",
-  "tags": ["أصول الفقه", "تراث", "الإمام الشافعي"],
+  "tags": ["أصول الفقه", "نصوص كلاسيكية", "الإمام الشافعي"],
   "status": "published"
 }

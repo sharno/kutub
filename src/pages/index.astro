@@ -7,33 +7,28 @@ import { getBooks } from "../lib/content";
 const books = await getBooks();
 ---
 
-<BaseLayout title="كُتُب | مكتبة عربية">
+<BaseLayout
+  title="كُتُب | مكتبة عربية للقراءة"
+  description="كتب عربية مرتبة للقراءة والبحث."
+>
   <section class="hero-panel" data-pagefind-ignore="all">
-    <div class="eyebrow">بداية المشروع</div>
-    <h1 class="font-display text-[clamp(2.4rem,6vw,4.3rem)] leading-tight">
-      مكتبة عربية سريعة لكتب Markdown و Typst
-    </h1>
-    <p>
-      هذا الأساس مبني على Astro و Pagefind حتى يبقى النشر بسيطًا على Cloudflare Pages، ويبقى التصفح
-      سريعًا حتى مع زيادة عدد الكتب والفصول.
-    </p>
-    <div class="meta-row">
-      <a class="pill" href="/search">الانتقال إلى البحث</a>
-      <span class="pill">Static-first</span>
-      <span class="pill">Cloudflare Pages</span>
-      <span class="pill">Pagefind</span>
+    <div class="meta-row justify-between">
+      <div>
+        <h1 class="font-display text-[clamp(1.6rem,3.5vw,2.2rem)] leading-tight">المكتبة</h1>
+        <p class="m-0 text-sm text-muted">كتب مرتبة للقراءة والبحث.</p>
+      </div>
+      <a class="pill" href="/search">البحث</a>
     </div>
   </section>
 
-  <div class="h-6"></div>
+  <div class="h-4"></div>
 
-  <section class="grid gap-4">
+  <section class="grid gap-4" id="books">
     <div class="meta-row justify-between">
       <div>
-        <div class="eyebrow">الكتب المتاحة</div>
-        <h2 class="font-display text-[clamp(1.6rem,4vw,2.5rem)] leading-tight">فهرس المكتبة</h2>
+        <h2 class="font-display text-[clamp(1.25rem,2.6vw,1.8rem)] leading-tight">الكتب</h2>
       </div>
-      <p class="text-muted">{books.length} كتاب</p>
+      <p class="text-muted">{books.length} كتاب جاهز</p>
     </div>
 
     <div class="grid grid-cols-[repeat(auto-fit,minmax(17rem,1fr))] gap-4" data-pagefind-ignore="all">
@@ -41,7 +36,7 @@ const books = await getBooks();
     </div>
   </section>
 
-  <div class="h-6"></div>
+  <div class="h-4"></div>
 
-  <SearchPanel heading="ابحث مباشرة داخل الفصول المفهرسة" />
+  <SearchPanel heading="ابحث داخل الكتب" />
 </BaseLayout>

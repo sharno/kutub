@@ -8,16 +8,14 @@ const { heading = "ابحث في الكتب" } = Astro.props;
 
 <section class="grid gap-4">
   <div>
-    <div class="eyebrow">البحث</div>
-    <h2 class="font-display text-[clamp(1.6rem,4vw,2.5rem)] leading-tight">{heading}</h2>
+    <h2 class="font-display text-[clamp(1.25rem,2.6vw,1.8rem)] leading-tight">{heading}</h2>
   </div>
 
-  <div class="surface-panel px-4 py-4" id="search-status">
-    فهرس البحث يُنشأ بعد تشغيل `npm run build`. أثناء `npm run dev` ستبقى هذه الصفحة مرئية لكن نتائج
-    البحث لن تعمل بعد.
+  <div class="surface-panel px-3 py-2 text-sm text-muted" id="search-status">
+    البحث في العناوين والنصوص.
   </div>
 
-  <div class="surface-panel p-4" id="search"></div>
+  <div class="surface-panel p-3" id="search"></div>
 </section>
 
 <script>
@@ -71,7 +69,7 @@ const { heading = "ابحث في الكتب" } = Astro.props;
       });
 
       if (status) {
-        status.textContent = "الفهرس جاهز. يمكنك البحث الآن.";
+        status.textContent = "البحث جاهز.";
       }
     } catch (error) {
       console.warn("Pagefind is unavailable until after a production build.", error);
