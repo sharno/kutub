@@ -60,7 +60,7 @@ console.log(`Saved machine source to ${machinePath}`);
 async function fetchJson<T>(url: string): Promise<T> {
   const response = await fetch(url, {
     headers: {
-      "user-agent": "kotob-importer/1.0",
+      "user-agent": "kutub-importer/1.0",
       accept: "application/json,text/plain,*/*",
     },
   });
