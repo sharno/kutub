@@ -85,6 +85,8 @@ const { Content } = await render(chapter);
       <nav
         id="chapter-sidebar"
         data-scroll-key={book.data.slug}
+        data-chapter-sidebar
+        style="visibility: hidden;"
         class="hidden max-h-[calc(100vh-2rem)] overflow-y-auto px-4 py-6 lg:grid lg:sticky lg:top-0"
         aria-label="فصول الكتاب"
       >
@@ -121,6 +123,10 @@ const { Content } = await render(chapter);
         </div>
       </nav>
     </aside>
+
+    <script>
+      import "../../../scripts/chapter-sidebar";
+    </script>
 
     <article class="grid gap-6 px-0 lg:px-10 lg:py-8">
       <header class="grid gap-4 border-b border-[rgba(73,53,34,0.12)] pb-6">
@@ -178,27 +184,4 @@ const { Content } = await render(chapter);
       </nav>
     </article>
   </div>
-
-  <script>
-    const sidebar = document.getElementById("chapter-sidebar");
-    if (sidebar) {
-      const storageKey = `chapter-sidebar-scroll:${sidebar.dataset.scrollKey ?? ""}`;
-      const savedScrollTop = sessionStorage.getItem(storageKey);
-      if (savedScrollTop !== null) {
-        sidebar.scrollTop = Number(savedScrollTop);
-      }
-
-      const persistScroll = () => {
-        sessionStorage.setItem(storageKey, String(sidebar.scrollTop));
-      };
-
-      sidebar.addEventListener("scroll", persistScroll, { passive: true });
-      window.addEventListener("pagehide", persistScroll, { passive: true });
-
-      const activeLink = sidebar.querySelector('[aria-current="page"]');
-      if (activeLink && savedScrollTop === null) {
-        activeLink.scrollIntoView({ block: "nearest" });
-      }
-    }
-  </script>
 </BaseLayout>
