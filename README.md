@@ -16,7 +16,8 @@ npm run build
 ```
 
 أثناء `dev` و`build` يتم أولًا تشغيل `npm run sync-content` لتوليد الفصول من المصادر canonical،
-ثم يُبنى `site/assets/site.css` عبر Tailwind CLI، ثم يولد `11ty` الصفحات داخل `dist/`، ثم ينشئ
+ثم يُحوَّل TypeScript الخاص بالواجهة إلى `site/assets/chapter-sidebar.js`، ثم يُبنى `site/assets/site.css`
+عبر Tailwind CLI، ثم يولد `11ty` الصفحات داخل `dist/`، ثم ينشئ
 Pagefind فهرس البحث داخل المجلد نفسه.
 
 إذا وُجد `canonicalSource` للكتاب، تُنسخ نسخة Markdown أيضًا إلى `public/downloads/<slug>.md` لتكون
@@ -25,6 +26,7 @@ Pagefind فهرس البحث داخل المجلد نفسه.
 ## هيكل المحتوى
 
 - `site/`: قوالب 11ty والواجهات والـ assets
+- `site/client/*.ts`: سكربتات الواجهة المصدرية
 - `src/data/books/*.json`: بيانات الكتب
 - `src/data/chapters/<book>/*.md`: فصول الكتب
 - `sources/turath/*.meta.json`: بيانات تراث والفهارس

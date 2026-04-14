@@ -1,16 +1,16 @@
 const SIDEBAR_SELECTOR = "[data-chapter-sidebar]";
 
-function getStorageKey(sidebar) {
+function getStorageKey(sidebar: HTMLElement): string {
   return `chapter-sidebar-scroll:${sidebar.dataset.scrollKey ?? ""}`;
 }
 
-function revealSidebar(sidebar) {
+function revealSidebar(sidebar: HTMLElement): void {
   requestAnimationFrame(() => {
     sidebar.style.visibility = "";
   });
 }
 
-function restoreSidebarScroll(sidebar) {
+function restoreSidebarScroll(sidebar: HTMLElement): void {
   const savedScrollTop = sessionStorage.getItem(getStorageKey(sidebar));
   if (savedScrollTop !== null) {
     sidebar.scrollTop = Number(savedScrollTop);
@@ -18,7 +18,7 @@ function restoreSidebarScroll(sidebar) {
     return;
   }
 
-  const activeLink = sidebar.querySelector('[aria-current="page"]');
+  const activeLink = sidebar.querySelector<HTMLElement>('[aria-current="page"]');
   if (activeLink) {
     activeLink.scrollIntoView({ block: "nearest" });
   }
@@ -26,25 +26,25 @@ function restoreSidebarScroll(sidebar) {
   revealSidebar(sidebar);
 }
 
-function persistSidebarScroll(sidebar) {
+function persistSidebarScroll(sidebar: HTMLElement): void {
   sessionStorage.setItem(getStorageKey(sidebar), String(sidebar.scrollTop));
 }
 
-function waitForFonts() {
+function waitForFonts(): Promise<void> {
   if ("fonts" in document && "ready" in document.fonts) {
-    return document.fonts.ready;
+    return document.fonts.ready.then(() => undefined);
   }
 
   return Promise.resolve();
 }
 
-function initChapterSidebar() {
-  const sidebar = document.querySelector(SIDEBAR_SELECTOR);
+function initChapterSidebar(): void {
+  const sidebar = document.querySelector<HTMLElement>(SIDEBAR_SELECTOR);
   if (!sidebar) {
     return;
   }
 
-  const persistScroll = () => {
+  const persistScroll = (): void => {
     persistSidebarScroll(sidebar);
   };
 
@@ -56,7 +56,7 @@ function initChapterSidebar() {
   });
   window.addEventListener("pagehide", persistScroll, { passive: true });
 
-  waitForFonts().then(() => {
+  void waitForFonts().then(() => {
     requestAnimationFrame(() => {
       restoreSidebarScroll(sidebar);
     });
