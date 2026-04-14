@@ -46,6 +46,14 @@ export interface RenderMarkdownInput {
   volumes: string[];
 }
 
+export interface CanonicalChapter {
+  order: number;
+  title: string;
+  slug: string;
+  excerpt: string;
+  body: string;
+}
+
 export function extractInfoField(info: string | undefined, label: string): string | null {
   if (!info) return null;
 
@@ -187,8 +195,125 @@ export function renderMarkdown({
   return `${lines.join("\n").replace(/\n{3,}/g, "\n\n")}\n`;
 }
 
+export function splitTurathJsonToChapters({
+  headings,
+  pages,
+}: {
+  headings: TurathHeading[];
+  pages: TurathPage[];
+}): CanonicalChapter[] {
+  const topLevelHeadings = headings.filter((heading) => (heading.level ?? 1) === 1);
+  const chapters: CanonicalChapter[] = [];
+
+  for (const [index, heading] of topLevelHeadings.entries()) {
+    const startPage = heading.page;
+    const nextHeading = topLevelHeadings[index + 1];
+    const endPageExclusive = nextHeading ? nextHeading.page : pages.length + 1;
+    const pageSlice = pages.slice(startPage - 1, endPageExclusive - 1);
+    const nestedHeadings = headings.filter(
+      (candidate) => candidate.page >= startPage && candidate.page < endPageExclusive && (candidate.level ?? 1) > 1,
+    );
+    const body = renderTurathChapterBody({
+      nestedHeadings,
+      pages: pageSlice,
+      startPage,
+    });
+
+    chapters.push(finalizeChapter({ title: heading.title.trim(), lines: body.split("\n") }, index + 1));
+  }
+
+  return chapters;
+}
+
+export function renderChapterMarkdown(chapter: CanonicalChapter): string {
+  return [
+    "---",
+    `title: ${yamlString(chapter.title)}`,
+    `slug: ${yamlString(chapter.slug)}`,
+    `order: ${chapter.order}`,
+    `excerpt: ${yamlString(chapter.excerpt)}`,
+    "---",
+    "",
+    chapter.body.trim(),
+    "",
+  ].join("\n");
+}
+
 export function yamlString(value: string | number | null | undefined): string {
   return JSON.stringify(value ?? "");
+}
+
+function renderTurathChapterBody({
+  nestedHeadings,
+  pages,
+  startPage,
+}: {
+  nestedHeadings: TurathHeading[];
+  pages: TurathPage[];
+  startPage: number;
+}): string {
+  const headingsByPage = groupHeadingsByPage(nestedHeadings);
+  const lines: string[] = [];
+
+  for (const [index, page] of pages.entries()) {
+    const pageId = startPage + index;
+    const pageHeadings = headingsByPage.get(pageId) ?? [];
+
+    for (const heading of pageHeadings) {
+      const headingLevel = Math.min((heading.level ?? 1) + 1, 6);
+      lines.push(`${"#".repeat(headingLevel)} ${heading.title}`);
+      lines.push("");
+    }
+
+    const cleanText = cleanupPageText(page?.text ?? "", pageHeadings);
+    if (!cleanText) {
+      continue;
+    }
+
+    lines.push(`<!-- page_id: ${pageId}; volume: ${page?.vol ?? ""}; printed_page: ${page?.page ?? ""} -->`);
+    lines.push("");
+    lines.push(cleanText);
+    lines.push("");
+  }
+
+  return lines.join("\n").trim();
+}
+
+function finalizeChapter(chapter: { title: string; lines: string[] }, order: number): CanonicalChapter {
+  const body = chapter.lines.join("\n").trim();
+  const excerpt = extractExcerpt(body);
+  const slugBase = slugifyArabic(chapter.title);
+
+  return {
+    order,
+    title: chapter.title,
+    slug: `${String(order).padStart(3, "0")}-${slugBase}`,
+    excerpt,
+    body,
+  };
+}
+
+function extractExcerpt(markdown: string): string {
+  const plain = markdown
+    .replace(/<!--[\s\S]*?-->/g, "")
+    .replace(/^#{1,6}\s+/gm, "")
+    .replace(/\[(.*?)\]\((.*?)\)/g, "$1")
+    .replace(/[*_`>#-]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+
+  return plain.slice(0, 180).trim();
+}
+
+function slugifyArabic(value: string): string {
+  const normalized = value
+    .normalize("NFKC")
+    .replace(/[\[\](){}«»"':،؛!؟.,]/g, " ")
+    .replace(/\s+/g, "-")
+    .replace(/-+/g, "-")
+    .replace(/^-|-$/g, "");
+
+  return normalized || "section";
 }
 
 function escapeRegExp(value: string): string {

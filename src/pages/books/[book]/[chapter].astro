@@ -1,7 +1,7 @@
 ---
 import { render } from "astro:content";
 import BaseLayout from "../../../layouts/BaseLayout.astro";
-import { getBookBySlug, getBookDownloadUrl, getBooks, getChapterUrl, getChaptersForBook } from "../../../lib/content";
+import { getBookBySlug, getBookDownloadUrl, getBooks, getChapterEditUrl, getChapterUrl, getChaptersForBook } from "../../../lib/content";
 
 export async function getStaticPaths() {
   const books = await getBooks();
@@ -43,6 +43,7 @@ if (!chapter) {
 const currentIndex = chapters.findIndex((entry) => entry.id === chapter.id);
 const previousChapter = currentIndex > 0 ? chapters[currentIndex - 1] : undefined;
 const nextChapter = currentIndex >= 0 ? chapters[currentIndex + 1] : undefined;
+const chapterEditUrl = getChapterEditUrl(book, chapter);
 
 const { Content } = await render(chapter);
 ---
@@ -139,6 +140,11 @@ const { Content } = await render(chapter);
             {book.data.title}
           </a>
           <span class="text-muted">المؤلف: {book.data.author}</span>
+          {chapterEditUrl && (
+            <a class="text-muted no-underline" href={chapterEditUrl} target="_blank" rel="noreferrer">
+              [edit]
+            </a>
+          )}
         </div>
         <h1 class="font-display text-[clamp(2rem,4.8vw,3.2rem)] leading-tight">{chapter.data.title}</h1>
         {chapter.data.excerpt && <p>{chapter.data.excerpt}</p>}

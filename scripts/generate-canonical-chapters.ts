@@ -1,18 +1,11 @@
-import { copyFile, mkdir, readFile, readdir, rm, writeFile } from "node:fs/promises";
+import { mkdir, readFile, readdir, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
-import {
-  cleanupPageText,
-  groupHeadingsByPage,
-  yamlString,
-  type TurathBookPayload,
-  type TurathHeading,
-  type TurathMetadataPayload,
-  type TurathPage,
-} from "./turath.ts";
+import { splitTurathJsonToChapters, yamlString, type CanonicalChapter, type TurathBookPayload, type TurathMetadataPayload } from "./turath.ts";
 
 interface BookConfig {
   slug: string;
   canonicalSource?: string;
+  canonicalChapterSource?: string;
   canonicalMachineSource?: string;
   canonicalMetaSource?: string;
 }
@@ -30,6 +23,13 @@ interface FinalChapter {
   body: string;
 }
 
+interface CanonicalChapterFrontmatter {
+  title: string;
+  slug: string;
+  order: number;
+  excerpt: string;
+}
+
 const projectRoot = process.cwd();
 const booksDir = path.join(projectRoot, "src", "data", "books");
 const generatedRoot = path.join(projectRoot, "src", "generated", "chapters");
@@ -45,7 +45,7 @@ for (const bookFile of bookFiles) {
   const bookPath = path.join(booksDir, bookFile);
   const book = JSON.parse(await readFile(bookPath, "utf8")) as BookConfig;
 
-  if (!book.canonicalSource && !book.canonicalMachineSource) {
+  if (!book.canonicalSource && !book.canonicalChapterSource && !book.canonicalMachineSource) {
     continue;
   }
 
@@ -58,8 +58,9 @@ for (const bookFile of bookFiles) {
 
   if (book.canonicalSource) {
     const canonicalPath = path.resolve(projectRoot, book.canonicalSource);
+    const canonicalMarkdown = await readFile(canonicalPath, "utf8");
     const downloadPath = path.join(downloadsRoot, `${book.slug}.md`);
-    await copyFile(canonicalPath, downloadPath);
+    await writeFile(downloadPath, sanitizePublicDownload(canonicalMarkdown), "utf8");
   }
 
   for (const chapter of chapters) {
@@ -93,6 +94,10 @@ if (generatedBooks.length === 0) {
 }
 
 async function loadChapters(book: BookConfig): Promise<FinalChapter[]> {
+  if (book.canonicalChapterSource) {
+    return loadCanonicalChapterDirectory(path.resolve(projectRoot, book.canonicalChapterSource));
+  }
+
   if (book.canonicalMachineSource && book.canonicalMetaSource) {
     const machinePath = path.resolve(projectRoot, book.canonicalMachineSource);
     const metaPath = path.resolve(projectRoot, book.canonicalMetaSource);
@@ -101,7 +106,7 @@ async function loadChapters(book: BookConfig): Promise<FinalChapter[]> {
       readJson<TurathMetadataPayload>(metaPath),
     ]);
 
-    return splitTurathJson({
+    return splitTurathJsonToChapters({
       headings: metaSource.indexes?.headings ?? [],
       pages: machineSource.pages ?? [],
     });
@@ -116,68 +121,83 @@ async function loadChapters(book: BookConfig): Promise<FinalChapter[]> {
   return [];
 }
 
-async function readJson<T>(filePath: string): Promise<T> {
-  return JSON.parse(await readFile(filePath, "utf8")) as T;
-}
+async function loadCanonicalChapterDirectory(directoryPath: string): Promise<FinalChapter[]> {
+  const chapterFiles = (await readdir(directoryPath))
+    .filter((entry) => entry.endsWith(".md"))
+    .sort((left, right) => left.localeCompare(right));
 
-function splitTurathJson({ headings, pages }: { headings: TurathHeading[]; pages: TurathPage[] }): FinalChapter[] {
-  const topLevelHeadings = headings.filter((heading) => (heading.level ?? 1) === 1);
   const chapters: FinalChapter[] = [];
 
-  for (const [index, heading] of topLevelHeadings.entries()) {
-    const startPage = heading.page;
-    const nextHeading = topLevelHeadings[index + 1];
-    const endPageExclusive = nextHeading ? nextHeading.page : pages.length + 1;
-    const pageSlice = pages.slice(startPage - 1, endPageExclusive - 1);
-    const nestedHeadings = headings.filter(
-      (candidate) => candidate.page >= startPage && candidate.page < endPageExclusive && (candidate.level ?? 1) > 1,
-    );
-    const body = renderTurathChapterBody({
-      nestedHeadings,
-      pages: pageSlice,
-      startPage,
-    });
+  for (const chapterFile of chapterFiles) {
+    const chapterPath = path.join(directoryPath, chapterFile);
+    const markdown = await readFile(chapterPath, "utf8");
+    const parsed = parseCanonicalChapterMarkdown(markdown);
 
-    chapters.push(finalizeChapter({ title: heading.title.trim(), lines: body.split("\n") }, index + 1));
+    chapters.push({
+      order: parsed.frontmatter.order,
+      title: parsed.frontmatter.title,
+      slug: parsed.frontmatter.slug,
+      excerpt: parsed.frontmatter.excerpt,
+      body: parsed.body,
+    });
   }
 
-  return chapters;
+  return chapters.sort((left, right) => left.order - right.order);
 }
 
-function renderTurathChapterBody({
-  nestedHeadings,
-  pages,
-  startPage,
-}: {
-  nestedHeadings: TurathHeading[];
-  pages: TurathPage[];
-  startPage: number;
-}): string {
-  const headingsByPage = groupHeadingsByPage(nestedHeadings);
-  const lines: string[] = [];
-
-  for (const [index, page] of pages.entries()) {
-    const pageId = startPage + index;
-    const pageHeadings = headingsByPage.get(pageId) ?? [];
-
-    for (const heading of pageHeadings) {
-      const headingLevel = Math.min((heading.level ?? 1) + 1, 6);
-      lines.push(`${"#".repeat(headingLevel)} ${heading.title}`);
-      lines.push("");
-    }
-
-    const cleanText = cleanupPageText(page?.text ?? "", pageHeadings);
-    if (!cleanText) {
-      continue;
-    }
-
-    lines.push(`<!-- page_id: ${pageId}; volume: ${page?.vol ?? ""}; printed_page: ${page?.page ?? ""} -->`);
-    lines.push("");
-    lines.push(cleanText);
-    lines.push("");
+function parseCanonicalChapterMarkdown(markdown: string): { frontmatter: CanonicalChapterFrontmatter; body: string } {
+  if (!markdown.startsWith("---")) {
+    throw new Error("Canonical chapter markdown is missing frontmatter.");
   }
 
-  return lines.join("\n").trim();
+  const end = markdown.indexOf("\n---", 3);
+  if (end === -1) {
+    throw new Error("Canonical chapter markdown has an unterminated frontmatter block.");
+  }
+
+  const rawFrontmatter = markdown.slice(3, end).trim();
+  const body = markdown.slice(end + 4).replace(/^\s+/, "").trim();
+  const values = new Map<string, string>();
+
+  for (const line of rawFrontmatter.split(/\r?\n/)) {
+    const separatorIndex = line.indexOf(":");
+    if (separatorIndex === -1) continue;
+
+    const key = line.slice(0, separatorIndex).trim();
+    const value = line.slice(separatorIndex + 1).trim();
+    values.set(key, value);
+  }
+
+  const title = parseFrontmatterString(values.get("title"), "title");
+  const slug = parseFrontmatterString(values.get("slug"), "slug");
+  const excerpt = parseFrontmatterString(values.get("excerpt"), "excerpt");
+  const order = Number(values.get("order"));
+
+  if (!Number.isFinite(order)) {
+    throw new Error("Canonical chapter markdown has an invalid order.");
+  }
+
+  return {
+    frontmatter: {
+      title,
+      slug,
+      order,
+      excerpt,
+    },
+    body,
+  };
+}
+
+function parseFrontmatterString(value: string | undefined, key: string): string {
+  if (!value) {
+    throw new Error(`Canonical chapter markdown is missing ${key}.`);
+  }
+
+  return JSON.parse(value) as string;
+}
+
+async function readJson<T>(filePath: string): Promise<T> {
+  return JSON.parse(await readFile(filePath, "utf8")) as T;
 }
 
 function splitCanonicalMarkdown(markdown: string): FinalChapter[] {
@@ -259,6 +279,14 @@ function stripFrontmatter(markdown: string): string {
   }
 
   return markdown.slice(end + 4).replace(/^\s+/, "");
+}
+
+function sanitizePublicDownload(markdown: string): string {
+  return markdown
+    .replace(/^source:\s*.*\r?\n/gm, "")
+    .replace(/^turath_book_id:\s*.*\r?\n/gm, "")
+    .replace(/^- المصدر:\s*.*\r?\n/gm, "")
+    .replace(/\n{3,}/g, "\n\n");
 }
 
 function slugifyArabic(value: string): string {

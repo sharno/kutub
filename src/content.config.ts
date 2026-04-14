@@ -12,6 +12,7 @@ const books = defineCollection({
     direction: z.literal("rtl"),
     sourceFormat: z.enum(["markdown", "typst"]),
     canonicalSource: z.string().optional(),
+    canonicalChapterSource: z.string().optional(),
     canonicalMachineSource: z.string().optional(),
     canonicalMetaSource: z.string().optional(),
     sourceUrl: z.string().url().optional(),

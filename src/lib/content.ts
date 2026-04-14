@@ -3,6 +3,9 @@ import { getCollection, type CollectionEntry } from "astro:content";
 export type BookEntry = CollectionEntry<"books">;
 export type ChapterEntry = CollectionEntry<"chapters">;
 
+const GITHUB_REPO_URL = "https://github.com/sharno/kutub";
+const GITHUB_DEFAULT_BRANCH = "main";
+
 export async function getBooks() {
   const books = await getCollection("books");
   return books.sort((left, right) => left.data.title.localeCompare(right.data.title, "ar"));
@@ -28,4 +31,13 @@ export function getBookDownloadUrl(book: BookEntry) {
 
 export function getChapterUrl(chapter: ChapterEntry) {
   return `/books/${chapter.data.book}/${chapter.data.slug}`;
+}
+
+export function getChapterEditUrl(book: BookEntry, chapter: ChapterEntry) {
+  if (!book.data.canonicalChapterSource) {
+    return null;
+  }
+
+  const chapterPath = `${book.data.canonicalChapterSource}/${chapter.data.slug}.md`.replace(/\\/g, "/");
+  return encodeURI(`${GITHUB_REPO_URL}/edit/${GITHUB_DEFAULT_BRANCH}/${chapterPath}`);
 }
