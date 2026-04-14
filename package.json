@@ -3,8 +3,8 @@
   "version": "1.0.0",
   "description": "Static Arabic books library built with Astro and Pagefind.",
   "scripts": {
-    "import:turath": "node scripts/import-turath-book.ts",
-    "sync-content": "node scripts/generate-canonical-chapters.ts",
+    "import:turath": "tsx scripts/import-turath-book.ts",
+    "sync-content": "tsx scripts/generate-canonical-chapters.ts",
     "dev": "npm run sync-content && astro dev",
     "build": "npm run sync-content && astro build && pagefind --site dist",
     "preview": "npm run sync-content && astro preview"
@@ -22,7 +22,8 @@
     "@tailwindcss/vite": "^4.2.2",
     "astro": "^6.1.6",
     "pagefind": "^1.5.2",
-    "tailwindcss": "^4.2.2"
+    "tailwindcss": "^4.2.2",
+    "tsx": "^4.21.0"
   },
   "devDependencies": {
     "@types/node": "^25.6.0"
