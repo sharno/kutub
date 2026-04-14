@@ -65,6 +65,48 @@
   .reader-prose blockquote {
     @apply me-0 rounded-s-none rounded-e-xl border-s-4 border-s-[rgba(142,75,34,0.55)] bg-[rgba(142,75,34,0.06)] px-4 py-3;
   }
+
+  .reader-prose sup {
+    @apply mx-[0.08rem] align-super text-[0.72em] leading-none;
+  }
+
+  .reader-prose sup a {
+    @apply no-underline;
+  }
+
+  .reader-prose .page-footnotes {
+    @apply mt-4 border-t border-[rgba(73,53,34,0.12)] pt-3 text-[0.88em] leading-[1.75] text-muted;
+  }
+
+  .reader-prose .page-separator {
+    @apply my-5 flex items-center gap-3 text-[0.72em] text-muted;
+  }
+
+  .reader-prose .page-separator::before,
+  .reader-prose .page-separator::after {
+    content: "";
+    @apply h-px flex-1 bg-[rgba(73,53,34,0.12)];
+  }
+
+  .reader-prose .page-separator span {
+    @apply rounded-md border border-[rgba(73,53,34,0.12)] bg-[rgba(255,252,247,0.92)] px-2 py-0.5;
+  }
+
+  .reader-prose .page-footnotes ol {
+    @apply m-0 grid gap-2 ps-5;
+  }
+
+  .reader-prose .page-footnotes li {
+    @apply my-0;
+  }
+
+  .reader-prose .page-footnotes p {
+    @apply inline;
+  }
+
+  .reader-prose .footnote-backref {
+    @apply ms-1 no-underline;
+  }
 }
 
 .pagefind-ui__search-input {
