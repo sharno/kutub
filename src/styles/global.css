@@ -79,17 +79,13 @@
   }
 
   .reader-prose .page-separator {
-    @apply my-5 flex items-center gap-3 text-[0.72em] text-muted;
+    @apply my-5 flex items-center justify-center gap-3 text-[0.72em] text-muted;
   }
 
   .reader-prose .page-separator::before,
   .reader-prose .page-separator::after {
     content: "";
     @apply h-px flex-1 bg-[rgba(73,53,34,0.12)];
-  }
-
-  .reader-prose .page-separator span {
-    @apply rounded-md border border-[rgba(73,53,34,0.12)] bg-[rgba(255,252,247,0.92)] px-2 py-0.5;
   }
 
   .reader-prose .page-footnotes ol {

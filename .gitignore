@@ -4,3 +4,5 @@ dist
 .DS_Store
 *.log
 src/generated
+playwright-report
+test-results

@@ -63,15 +63,16 @@ function transformTurathPageFootnotes(tree: Root): void {
     }
 
     index = cursor - 1;
+    const nextPageMeta = cursor < tree.children.length ? getPageMeta(tree.children[cursor]) : null;
 
     const separatorIndex = pageNodes.findIndex((child) => child.type === "thematicBreak");
     if (separatorIndex === -1) {
       nextChildren.push(...pageNodes);
-      if (cursor < tree.children.length) {
-        nextChildren.push({
-          type: "html",
-          value: renderPageSeparator(pageMeta),
-        } satisfies Html);
+      if (nextPageMeta) {
+      nextChildren.push({
+        type: "html",
+        value: renderStandalonePageSeparator(nextPageMeta),
+      } satisfies Html);
       }
       continue;
     }
@@ -82,10 +83,10 @@ function transformTurathPageFootnotes(tree: Root): void {
 
     if (footnotes.length === 0) {
       nextChildren.push(...bodyNodes);
-      if (cursor < tree.children.length) {
-        nextChildren.push({
-          type: "html",
-          value: renderPageSeparator(pageMeta),
+      if (nextPageMeta) {
+      nextChildren.push({
+        type: "html",
+          value: renderStandalonePageSeparator(nextPageMeta),
         } satisfies Html);
       }
       continue;
@@ -100,14 +101,8 @@ function transformTurathPageFootnotes(tree: Root): void {
 
     nextChildren.push({
       type: "html",
-      value: renderFootnotesSection(footnotes),
+      value: renderFootnotesSection(footnotes, nextPageMeta),
     } satisfies Html);
-    if (cursor < tree.children.length) {
-      nextChildren.push({
-        type: "html",
-        value: renderPageSeparator(pageMeta),
-      } satisfies Html);
-    }
   }
 
   tree.children = nextChildren;
@@ -289,7 +284,7 @@ function parseFootnoteMarker(line: string): FootnoteMarker | null {
   return null;
 }
 
-function renderFootnotesSection(footnotes: Footnote[]): string {
+function renderFootnotesSection(footnotes: Footnote[], nextPageMeta: PageMeta | null): string {
   const items = footnotes
     .map(
       (footnote) =>
@@ -297,7 +292,8 @@ function renderFootnotesSection(footnotes: Footnote[]): string {
     )
     .join("");
 
-  return `<section class="page-footnotes"><ol>${items}</ol></section>`;
+  const separator = nextPageMeta ? renderPageSeparator(nextPageMeta) : "";
+  return `<section class="page-footnotes"><ol>${items}</ol>${separator}</section>`;
 }
 
 function renderFootnoteBody(lines: string[]): string {
@@ -327,16 +323,20 @@ function renderPageSeparator(pageMeta: PageMeta): string {
   const parts: string[] = [];
 
   if (pageMeta.volume) {
-    parts.push(`ج ${escapeHtml(pageMeta.volume)}`);
+    parts.push(`ج ${pageMeta.volume}`);
   }
 
   if (pageMeta.printedPage) {
-    parts.push(`ص ${escapeHtml(pageMeta.printedPage)}`);
+    parts.push(`ص ${pageMeta.printedPage}`);
   } else {
     parts.push(`صفحة ${pageMeta.pageId}`);
   }
 
-  return `<div class="page-separator" aria-label="فاصل الصفحة"><span>${parts.join(" · ")}</span></div>`;
+  return `<p class="page-separator" aria-label="فاصل الصفحة"><span>${escapeHtml(parts.join(" · "))}</span></p>`;
+}
+
+function renderStandalonePageSeparator(pageMeta: PageMeta): string {
+  return `<section class="page-break-meta">${renderPageSeparator(pageMeta)}</section>`;
 }
 
 function getPageMeta(node: RootContent): PageMeta | null {

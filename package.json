@@ -7,7 +7,9 @@
     "sync-content": "tsx scripts/generate-canonical-chapters.ts",
     "dev": "npm run sync-content && astro dev",
     "build": "npm run sync-content && astro build && pagefind --site dist",
-    "preview": "npm run sync-content && astro preview"
+    "preview": "npm run sync-content && astro preview",
+    "preview:e2e": "npm run build && astro preview --host 127.0.0.1 --port 4173",
+    "test:e2e": "playwright test"
   },
   "keywords": [
     "astro",
@@ -26,6 +28,7 @@
     "tsx": "^4.21.0"
   },
   "devDependencies": {
+    "@playwright/test": "^1.59.1",
     "@types/node": "^25.6.0"
   }
 }
