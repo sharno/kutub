@@ -1,5 +1,5 @@
 import { toString } from "mdast-util-to-string";
-import type { Break, Html, Paragraph, PhrasingContent, Root, RootContent, Text } from "mdast";
+import type { Break, Html, PhrasingContent, Root, RootContent, Text } from "mdast";
 import { visit } from "unist-util-visit";
 import type { Plugin } from "unified";
 
@@ -53,10 +53,6 @@ function transformTurathPageFootnotes(tree: Root): void {
     }
 
     nextChildren.push(node);
-    nextChildren.push({
-      type: "html",
-      value: renderPageSeparator(pageMeta),
-    } satisfies Html);
 
     const pageNodes: RootContent[] = [];
     let cursor = index + 1;
@@ -71,6 +67,12 @@ function transformTurathPageFootnotes(tree: Root): void {
     const separatorIndex = pageNodes.findIndex((child) => child.type === "thematicBreak");
     if (separatorIndex === -1) {
       nextChildren.push(...pageNodes);
+      if (cursor < tree.children.length) {
+        nextChildren.push({
+          type: "html",
+          value: renderPageSeparator(pageMeta),
+        } satisfies Html);
+      }
       continue;
     }
 
@@ -80,6 +82,12 @@ function transformTurathPageFootnotes(tree: Root): void {
 
     if (footnotes.length === 0) {
       nextChildren.push(...bodyNodes);
+      if (cursor < tree.children.length) {
+        nextChildren.push({
+          type: "html",
+          value: renderPageSeparator(pageMeta),
+        } satisfies Html);
+      }
       continue;
     }
 
@@ -94,6 +102,12 @@ function transformTurathPageFootnotes(tree: Root): void {
       type: "html",
       value: renderFootnotesSection(footnotes),
     } satisfies Html);
+    if (cursor < tree.children.length) {
+      nextChildren.push({
+        type: "html",
+        value: renderPageSeparator(pageMeta),
+      } satisfies Html);
+    }
   }
 
   tree.children = nextChildren;
