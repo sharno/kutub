@@ -7,13 +7,14 @@
     "sync-content": "tsx scripts/generate-canonical-chapters.ts",
     "css": "tailwindcss -i ./src/styles/global.css -o ./site/assets/site.css --minify",
     "css:watch": "tailwindcss -i ./src/styles/global.css -o ./site/assets/site.css --watch",
-    "eleventy": "node --import tsx ./node_modules/@11ty/eleventy/cmd.cjs",
-    "eleventy:serve": "node --import tsx ./node_modules/@11ty/eleventy/cmd.cjs --serve --port=4321",
+    "eleventy": "node --import tsx ./node_modules/@11ty/eleventy/cmd.cjs --config=eleventy.config.ts",
+    "eleventy:serve": "node --import tsx ./node_modules/@11ty/eleventy/cmd.cjs --config=eleventy.config.ts --serve --port=4321",
     "dev": "npm run sync-content && npm run css && run-p css:watch eleventy:serve",
     "build": "npm run sync-content && npm run css && npm run eleventy && pagefind --site dist",
     "preview": "http-server dist -a 127.0.0.1 -p 4173 -c-1",
     "preview:e2e": "npm run build && npm run preview",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "typecheck": "tsc --noEmit"
   },
   "keywords": [
     "eleventy",

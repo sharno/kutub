@@ -15,7 +15,7 @@
     "types": ["node"]
   },
   "include": [
-    ".eleventy.js",
+    "eleventy.config.ts",
     "playwright.config.ts",
     "scripts/**/*.ts",
     "site/**/*.ts",

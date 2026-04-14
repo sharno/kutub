@@ -1,7 +1,12 @@
 import MarkdownIt from "markdown-it";
 import { renderTurathMarkdown } from "./site/_includes/lib/render-turath-markdown.ts";
 
-export default function eleventyConfig(eleventyConfig) {
+export default function configureEleventy(eleventyConfig: {
+  setLibrary: (name: string, library: MarkdownIt) => void;
+  addFilter: (name: string, callback: (value: string) => string) => void;
+  addPassthroughCopy: (mapping: Record<string, string>) => void;
+  addWatchTarget: (target: string) => void;
+}) {
   const markdown = new MarkdownIt({
     html: true,
     linkify: false,
