@@ -1,0 +1,90 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "IBM Plex Sans Arabic", "Noto Sans Arabic", sans-serif;
+  --font-display: "Amiri", "Noto Naskh Arabic", serif;
+  --color-ink: #201913;
+  --color-muted: #60544a;
+  --color-bronze: #8e4b22;
+  --color-bronze-strong: #6f3516;
+}
+
+@layer base {
+  html {
+    @apply bg-[#fcf8f1] text-ink antialiased;
+  }
+
+  body {
+    @apply m-0 min-h-screen font-sans;
+    background:
+      radial-gradient(circle at top right, rgba(189, 145, 92, 0.28), transparent 28rem),
+      linear-gradient(180deg, #fcf8f1 0%, #f6eddc 100%);
+  }
+
+  a {
+    text-underline-offset: 0.22em;
+    text-decoration-color: rgba(142, 75, 34, 0.4);
+  }
+
+  img {
+    @apply block max-w-full;
+  }
+}
+
+@layer components {
+  .surface-panel {
+    @apply rounded-[24px] border border-[rgba(73,53,34,0.14)] bg-[rgba(255,251,243,0.9)] shadow-[0_16px_40px_rgba(76,56,38,0.08)];
+  }
+
+  .hero-panel {
+    @apply grid gap-4 rounded-[24px] border border-[rgba(73,53,34,0.14)] p-6 shadow-[0_16px_40px_rgba(76,56,38,0.08)] md:p-8 xl:p-12;
+    background:
+      radial-gradient(circle at top left, rgba(142, 75, 34, 0.08), transparent 18rem),
+      linear-gradient(180deg, rgba(255, 251, 243, 0.95), rgba(248, 240, 225, 0.92));
+  }
+
+  .eyebrow {
+    @apply text-sm uppercase tracking-[0.08em] text-muted;
+  }
+
+  .pill {
+    @apply inline-flex items-center rounded-full border border-[rgba(142,75,34,0.2)] bg-[rgba(142,75,34,0.08)] px-3 py-1 text-sm text-bronze-strong no-underline;
+  }
+
+  .meta-row {
+    @apply flex flex-wrap items-center gap-3 md:gap-4;
+  }
+
+  .reader-prose {
+    @apply max-w-[42rem] font-display text-[clamp(1.2rem,1rem+0.6vw,1.55rem)] leading-[1.9] text-ink;
+  }
+
+  .reader-prose :where(p, ul, ol, blockquote, h2, h3, h4) {
+    @apply my-4;
+  }
+
+  .reader-prose :where(h2, h3, h4) {
+    @apply font-display leading-tight;
+  }
+
+  .reader-prose blockquote {
+    @apply me-0 rounded-s-none rounded-e-2xl border-s-4 border-s-[rgba(142,75,34,0.55)] bg-[rgba(142,75,34,0.06)] px-5 py-4;
+  }
+}
+
+.pagefind-ui__search-input {
+  direction: rtl;
+  font-family: var(--font-sans);
+}
+
+.pagefind-ui__result {
+  text-align: right;
+}
+
+.pagefind-ui__message,
+.pagefind-ui__result-excerpt,
+.pagefind-ui__result-link,
+.pagefind-ui__button,
+.pagefind-ui__result-title {
+  font-family: var(--font-sans);
+}

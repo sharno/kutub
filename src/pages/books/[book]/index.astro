@@ -1,0 +1,65 @@
+---
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+import { getBookBySlug, getBooks, getChapterUrl, getChaptersForBook } from "../../../lib/content";
+
+export async function getStaticPaths() {
+  const books = await getBooks();
+  return books.map((book) => ({
+    params: { book: book.data.slug },
+  }));
+}
+
+const bookSlug = Astro.params.book;
+
+if (!bookSlug) {
+  throw new Error("Missing book slug.");
+}
+
+const book = await getBookBySlug(bookSlug);
+
+if (!book) {
+  return Astro.redirect("/");
+}
+
+const chapters = await getChaptersForBook(book.data.slug);
+---
+
+<BaseLayout title={`${book.data.title} | كُتُب`} description={book.data.description} dir={book.data.direction}>
+  <section class="hero-panel" data-pagefind-ignore="all">
+    <div class="eyebrow">كتاب</div>
+    <h1 class="font-display text-[clamp(2.4rem,6vw,4.3rem)] leading-tight">{book.data.title}</h1>
+    <p class="text-muted">المؤلف: {book.data.author}</p>
+    <p>{book.data.description}</p>
+
+    <div class="flex flex-wrap gap-2">
+      {book.data.tags.map((tag) => <span class="pill">{tag}</span>)}
+      <span class="pill">{book.data.status}</span>
+    </div>
+  </section>
+
+  <div class="h-6"></div>
+
+  <section class="grid gap-4">
+    <div class="meta-row justify-between">
+      <div>
+        <div class="eyebrow">الفصول</div>
+        <h2 class="font-display text-[clamp(1.6rem,4vw,2.5rem)] leading-tight">محتويات الكتاب</h2>
+      </div>
+      <p class="text-muted">{chapters.length} فصل</p>
+    </div>
+
+    <div class="grid gap-4" data-pagefind-ignore="all">
+      {chapters.map((chapter) => (
+        <article class="surface-panel grid gap-3 p-5">
+          <div class="eyebrow">الفصل {chapter.data.order}</div>
+          <h3 class="font-display text-2xl leading-tight">
+            <a href={getChapterUrl(chapter)} class="text-bronze-strong">
+              {chapter.data.title}
+            </a>
+          </h3>
+          {chapter.data.excerpt && <p>{chapter.data.excerpt}</p>}
+        </article>
+      ))}
+    </div>
+  </section>
+</BaseLayout>

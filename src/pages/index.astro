@@ -1,0 +1,47 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import BookCard from "../components/BookCard.astro";
+import SearchPanel from "../components/SearchPanel.astro";
+import { getBooks } from "../lib/content";
+
+const books = await getBooks();
+---
+
+<BaseLayout title="كُتُب | مكتبة عربية">
+  <section class="hero-panel" data-pagefind-ignore="all">
+    <div class="eyebrow">بداية المشروع</div>
+    <h1 class="font-display text-[clamp(2.4rem,6vw,4.3rem)] leading-tight">
+      مكتبة عربية سريعة لكتب Markdown و Typst
+    </h1>
+    <p>
+      هذا الأساس مبني على Astro و Pagefind حتى يبقى النشر بسيطًا على Cloudflare Pages، ويبقى التصفح
+      سريعًا حتى مع زيادة عدد الكتب والفصول.
+    </p>
+    <div class="meta-row">
+      <a class="pill" href="/search">الانتقال إلى البحث</a>
+      <span class="pill">Static-first</span>
+      <span class="pill">Cloudflare Pages</span>
+      <span class="pill">Pagefind</span>
+    </div>
+  </section>
+
+  <div class="h-6"></div>
+
+  <section class="grid gap-4">
+    <div class="meta-row justify-between">
+      <div>
+        <div class="eyebrow">الكتب المتاحة</div>
+        <h2 class="font-display text-[clamp(1.6rem,4vw,2.5rem)] leading-tight">فهرس المكتبة</h2>
+      </div>
+      <p class="text-muted">{books.length} كتاب</p>
+    </div>
+
+    <div class="grid grid-cols-[repeat(auto-fit,minmax(17rem,1fr))] gap-4" data-pagefind-ignore="all">
+      {books.map((book) => <BookCard book={book} />)}
+    </div>
+  </section>
+
+  <div class="h-6"></div>
+
+  <SearchPanel heading="ابحث مباشرة داخل الفصول المفهرسة" />
+</BaseLayout>

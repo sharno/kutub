@@ -1,0 +1,107 @@
+---
+import { render } from "astro:content";
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+import { getBookBySlug, getBooks, getChapterUrl, getChaptersForBook } from "../../../lib/content";
+
+export async function getStaticPaths() {
+  const books = await getBooks();
+  const entries = await Promise.all(
+    books.map(async (book) => {
+      const chapters = await getChaptersForBook(book.data.slug);
+      return chapters.map((chapter) => ({
+        params: {
+          book: book.data.slug,
+          chapter: chapter.data.slug,
+        },
+      }));
+    }),
+  );
+
+  return entries.flat();
+}
+
+const bookSlug = Astro.params.book;
+const chapterSlug = Astro.params.chapter;
+
+if (!bookSlug || !chapterSlug) {
+  throw new Error("Missing route params.");
+}
+
+const book = await getBookBySlug(bookSlug);
+
+if (!book) {
+  return Astro.redirect("/");
+}
+
+const chapters = await getChaptersForBook(bookSlug);
+const chapter = chapters.find((entry) => entry.data.slug === chapterSlug);
+
+if (!chapter) {
+  return Astro.redirect(`/books/${bookSlug}`);
+}
+
+const currentIndex = chapters.findIndex((entry) => entry.id === chapter.id);
+const previousChapter = currentIndex > 0 ? chapters[currentIndex - 1] : undefined;
+const nextChapter = currentIndex >= 0 ? chapters[currentIndex + 1] : undefined;
+
+const { Content } = await render(chapter);
+---
+
+<BaseLayout
+  title={`${chapter.data.title} | ${book.data.title}`}
+  description={chapter.data.excerpt ?? book.data.description}
+  dir={book.data.direction}
+>
+  <article class="grid gap-4">
+    <header class="hero-panel">
+      <div class="eyebrow">نص مفهرس</div>
+      <div class="meta-row">
+        <a class="text-bronze-strong" href={`/books/${book.data.slug}`}>
+          {book.data.title}
+        </a>
+        <span class="text-muted">المؤلف: {book.data.author}</span>
+      </div>
+      <h1 class="font-display text-[clamp(2.4rem,6vw,4.3rem)] leading-tight">{chapter.data.title}</h1>
+      {chapter.data.excerpt && <p>{chapter.data.excerpt}</p>}
+
+      <div class="flex flex-wrap gap-2">
+        <span class="pill" data-pagefind-filter={`book:${book.data.title}`}>{book.data.title}</span>
+        <span class="pill" data-pagefind-filter={`author:${book.data.author}`}>{book.data.author}</span>
+      </div>
+    </header>
+
+    <div class="surface-panel grid gap-4 p-5" data-pagefind-body>
+      <div class="meta-row text-sm text-muted">
+        <span data-pagefind-meta="book">{book.data.title}</span>
+        <span data-pagefind-meta="author">{book.data.author}</span>
+        <span data-pagefind-meta="chapter">{chapter.data.title}</span>
+      </div>
+
+      <div class="reader-prose">
+        <Content />
+      </div>
+    </div>
+
+    <nav
+      class="surface-panel meta-row justify-between p-5"
+      aria-label="التنقل بين الفصول"
+      data-pagefind-ignore="all"
+    >
+      {previousChapter ? (
+        <a href={getChapterUrl(previousChapter)} class="text-bronze-strong">
+          ← {previousChapter.data.title}
+        </a>
+      ) : (
+        <span class="text-muted">بداية الكتاب</span>
+      )}
+
+      {nextChapter ? (
+        <a href={getChapterUrl(nextChapter)} class="text-bronze-strong">
+          {nextChapter.data.title} →
+        </a>
+      ) : (
+        <span class="text-muted">نهاية الفصول الحالية</span>
+      )}
+    </nav>
+  </article>
+</BaseLayout>

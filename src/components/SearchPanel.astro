@@ -1,0 +1,82 @@
+---
+interface Props {
+  heading?: string;
+}
+
+const { heading = "ابحث في الكتب" } = Astro.props;
+---
+
+<section class="grid gap-4">
+  <div>
+    <div class="eyebrow">البحث</div>
+    <h2 class="font-display text-[clamp(1.6rem,4vw,2.5rem)] leading-tight">{heading}</h2>
+  </div>
+
+  <div class="surface-panel px-4 py-4" id="search-status">
+    فهرس البحث يُنشأ بعد تشغيل `npm run build`. أثناء `npm run dev` ستبقى هذه الصفحة مرئية لكن نتائج
+    البحث لن تعمل بعد.
+  </div>
+
+  <div class="surface-panel p-4" id="search"></div>
+</section>
+
+<script>
+  const status = document.getElementById("search-status");
+  const root = document.getElementById("search");
+
+  async function boot() {
+    if (!root) return;
+
+    try {
+      const cssId = "pagefind-ui-styles";
+      const scriptId = "pagefind-ui-script";
+      if (!document.getElementById(cssId)) {
+        const link = document.createElement("link");
+        link.id = cssId;
+        link.rel = "stylesheet";
+        link.href = "/pagefind/pagefind-ui.css";
+        document.head.append(link);
+      }
+
+      if (!document.getElementById(scriptId)) {
+        await new Promise((resolve, reject) => {
+          const script = document.createElement("script");
+          script.id = scriptId;
+          script.src = "/pagefind/pagefind-ui.js";
+          script.onload = resolve;
+          script.onerror = reject;
+          document.head.append(script);
+        });
+      }
+
+      if (!("PagefindUI" in window)) {
+        throw new Error("PagefindUI global was not loaded.");
+      }
+
+      new window.PagefindUI({
+        element: "#search",
+        showImages: false,
+        showSubResults: true,
+        excerptLength: 18,
+        translations: {
+          placeholder: "ابحث في النصوص والعناوين",
+          clear_search: "مسح",
+          load_more: "نتائج إضافية",
+          search_label: "بحث",
+          zero_results: "لا توجد نتائج مطابقة",
+          many_results: "[COUNT] نتيجة",
+          one_result: "نتيجة واحدة",
+          alt_search: "ابحث عن [SEARCH_TERM]",
+        },
+      });
+
+      if (status) {
+        status.textContent = "الفهرس جاهز. يمكنك البحث الآن.";
+      }
+    } catch (error) {
+      console.warn("Pagefind is unavailable until after a production build.", error);
+    }
+  }
+
+  boot();
+</script>

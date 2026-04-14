@@ -1,0 +1,26 @@
+---
+import type { BookEntry } from "../lib/content";
+import { getBookUrl } from "../lib/content";
+
+interface Props {
+  book: BookEntry;
+}
+
+const { book } = Astro.props;
+---
+
+<article class="grid gap-3 rounded-[24px] border border-[rgba(73,53,34,0.14)] bg-[#fffaf1] p-5 shadow-[0_16px_40px_rgba(76,56,38,0.08)]">
+  <div class="eyebrow">كتاب</div>
+  <h3 class="font-display text-3xl leading-tight">
+    <a href={getBookUrl(book)} class="text-bronze-strong">
+      {book.data.title}
+    </a>
+  </h3>
+  <p class="text-muted">المؤلف: {book.data.author}</p>
+  <p>{book.data.description}</p>
+
+  <div class="flex flex-wrap gap-2">
+    {book.data.tags.map((tag) => <span class="pill">{tag}</span>)}
+    <span class="pill">{book.data.sourceFormat}</span>
+  </div>
+</article>
